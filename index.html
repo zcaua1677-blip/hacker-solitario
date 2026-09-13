@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hacker Solitario</title>
+<style>
+body{background:black;color:#00ff00;font-family:monospace;padding:10px}
+#term{border:1px solid #00ff00;height:300px;overflow-y:auto;padding:10px}
+input{width:100%;background:black;color:#00ff00;border:1px solid #00ff00;padding:10px;margin-top:10px}
+button{background:#00ff00;color:black;border:none;padding:8px;margin:3px}
+</style>
+</head>
+<body>
+<h2>> HACKER SOLITARIO v0.1</h2>
+<div id="term"></div>
+<input id="cmd" placeholder="digite help e aperte enter" autofocus>
+<div id="loja">
+<button onclick="buy('connectbot')">Comprar ConnectBot $50</button>
+<button onclick="buy('termux')">Comprar Termux $150</button>
+<button onclick="buy('nmap')">Comprar Nmap $300</button>
+</div>
+<p>Dinheiro: $<span id="money">100</span></p>
+<script>
+let money=100;
+let apps=[];
+let term=document.getElementById('term');
+function log(t){term.innerHTML+=t+"<br>";term.scrollTop=term.scrollHeight}
+log("Bem vindo, solitario. Digite 'help'");
+document.getElementById('cmd').addEventListener('keydown',e=>{
+ if(e.key==='Enter'){
+  let c=e.target.value; log("> "+c); handle(c); e.target.value="";
+ }
+});
+function handle(c){
+ if(c==='help') log("comandos: help, money, apps, ssh, nmap, loja");
+ else if(c==='money') log("Voce tem $"+money);
+ else if(c==='apps') log("Apps: "+ (apps.join(", ")||"nenhum"));
+ else if(c.startsWith('ssh')) {
+  if(!apps.includes('connectbot')) log("ERRO: precisa comprar ConnectBot");
+  else {log("Conectando... Acesso concedido! +$30"); money+=30; document.getElementById('money').innerText=money;}
+ }
+ else if(c==='nmap'){
+  if(!apps.includes('nmap')) log("ERRO: precisa comprar Nmap");
+  else log("Escaneando... portas abertas encontradas!");
+ } else log("comando desconhecido");
+}
+function buy(app){
+ let price={connectbot:50,termux:150,nmap:300}[app];
+ if(money>=price &&!apps.includes(app)){money-=price;apps.push(app);document.getElementById('money').innerText=money;log(app+" comprado!");}
+ else if(apps.includes(app)) log("ja tem esse app");
+ else log("dinheiro insuficiente");
+}
+</script>
+</body>
+</html>
