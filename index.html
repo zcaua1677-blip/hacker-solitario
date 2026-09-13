@@ -1,39 +1,43 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HACKER SOLITARIO OS v4</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:monospace}
-body{background:#000;color:#0f0;height:100vh;overflow:hidden}
-#desktop{background:#121a25;height:100vh;padding:10px}
-.icon{width:70px;text-align:center;padding:8px;cursor:pointer;display:inline-block;margin:5px;border-radius:6px}
-.icon:hover{background:rgba(0,255,0,.2)}
-.icon b{font-size:30px;display:block}
-.window{position:absolute;left:1%;top:2%;width:98%;height:88%;background:#000;border:2px solid #0f0;display:none;flex-direction:column;z-index:10}
+body{background:#0a0a0a;color:#0f0;height:100vh;overflow:hidden}
+#desktop{background:radial-gradient(#1a2a1a,#0f1419);height:100vh;padding:12px}
+#icons{display:flex;gap:15px}
+.icon{width:72px;text-align:center;padding:8px;cursor:pointer;border-radius:6px}
+.icon:hover{background:rgba(0,255,0,.15)}
+.icon b{font-size:32px;display:block}
+.window{position:absolute;left:1%;top:2%;width:98%;height:85%;background:#000;border:2px solid #0f0;display:none;flex-direction:column;z-index:20;box-shadow:0 0 25px #0f04}
 .window.active{display:flex}
 .titlebar{background:#0f0;color:#000;padding:6px 10px;display:flex;justify-content:space-between;font-weight:bold}
-.term{flex:1;overflow-y:auto;padding:10px;font-size:12px}
+.term{flex:1;overflow-y:auto;padding:10px;font-size:12px;line-height:1.4}
 .input{display:flex;background:#111;border-top:1px solid #0f0;padding:6px}
 .input input{flex:1;background:#000;border:none;color:#0f0;outline:none}
-.net{background:#111;border:1px solid #0a0;margin:6px 0;padding:8px;cursor:pointer}
-.net:hover{border-color:#0f0;background:#1a2a1a}
+.net{background:#0f0f0f;border:1px solid #0a0;padding:8px;margin:6px 0}
 .net b{color:#0f0}
-.tag{font-size:10px;background:#0f0;color:#000;padding:2px 4px;margin-left:5px}
-#addBtn{background:#0f0;color:#000;border:none;padding:10px;width:100%;font-weight:bold;cursor:pointer}
+.btn{background:#0f0;color:#000;border:none;padding:6px 10px;font-weight:bold;cursor:pointer;margin:3px}
+.btn2{background:#111;color:#0f0;border:1px solid #0f0;padding:6px 10px;cursor:pointer}
+#taskbar{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:2px solid #0f0;padding:5px 10px;font-size:11px;display:flex;justify-content:space-between}
 .host{background:#111;border:1px solid #0a0;padding:8px;margin:5px 0;display:flex;justify-content:space-between;cursor:pointer}
+.host:hover{border-color:#0f0}
 .modal{position:absolute;inset:0;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;z-index:50}
 .modal.active{display:flex}
-.modal-box{background:#000;border:2px solid #0f0;padding:15px;width:90%;max-width:380px}
+.modal-box{background:#000;border:2px solid #0f0;padding:15px;width:92%;max-width:380px}
 .modal-box input,select{width:100%;background:#111;border:1px solid #0f0;color:#0f0;padding:7px;margin:4px 0}
-#taskbar{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:2px solid #0f0;padding:5px 10px;font-size:11px;display:flex;justify-content:space-between}
 </style>
 </head>
 <body>
 <div id="desktop">
+<div id="icons">
 <div class="icon" onclick="openW('termux')"><b>📱</b><span>Termux</span></div>
 <div class="icon" onclick="openW('connect')"><b>🔌</b><span>ConnectBot</span></div>
 <div class="icon" onclick="openW('nmap')"><b>🌐</b><span>Nmap</span></div>
+</div>
 </div>
 
 <div id="termux" class="window active">
@@ -44,17 +48,57 @@ body{background:#000;color:#0f0;height:100vh;overflow:hidden}
 
 <div id="nmap" class="window">
 <div class="titlebar"><span>Nmap - Scanner de Redes Próximas</span><b onclick="closeW('nmap')" style="cursor:pointer">[X]</b></div>
-<div style="padding:10px;display:flex;gap:5px">
-<input id="nin" placeholder="192.168.1.0/24 ou deixe vazio p/ escanear perto" style="flex:1;background:#111;border:1px solid #0f0;color:#0f0;padding:8px">
-<button onclick="scanNear()" style="background:#0f0;color:#000;border:none;padding:8px;font-weight:bold">SCAN</button>
+<div style="padding:8px;display:flex;gap:5px">
+<button class="btn" onclick="scanNear()">📡 SCANEAR REDES PERTO</button>
+<button class="btn2" onclick="document.getElementById('nout').innerHTML=''">LIMPAR</button>
 </div>
-<div id="nout" class="term"></div>
+<div id="nout" class="term">Clique em SCANEAR para achar redes por perto...</div>
+<div class="input"><span>nmap> </span><input id="nin" placeholder="nmap 192.168.1.1"></div>
 </div>
 
 <div id="connect" class="window">
 <div class="titlebar"><span>ConnectBot - Hosts</span><b onclick="closeW('connect')" style="cursor:pointer">[X]</b></div>
-<div id="hosts" style="padding:10px;overflow-y:auto"></div>
-<button id="addBtn" onclick="showAdd()">+ ADICIONAR HOST MANUAL</button>
+<div id="hlist" style="padding:8px;overflow:auto;flex:1"></div>
+<button class="btn" style="width:100%" onclick="showAdd()">+ ADICIONAR HOST MANUAL</button>
 <div id="cterm" class="term" style="display:none;border-top:2px solid #0f0"></div>
-<div id="cinput" class="input" style="display:none"><span># </span><input id="cin"></div>
-<div id="addModal" class
+<div id="cinput" class="input" style="display:none"><span>#> </span><input id="cin"></div>
+<div id="addModal" class="modal"><div class="modal-box">
+<h3>Novo Host</h3>
+<select id="proto"><option>ssh</option><option>telnet</option><option>local</option></select>
+<input id="nick" placeholder="Apelido">
+<input id="userhost" placeholder="root@192.168.1.1">
+<input id="port" value="22" placeholder="Porta">
+<button class="btn" onclick="addHostManual()" style="width:48%">SALVAR</button>
+<button class="btn2" onclick="hideAdd()" style="width:48%">CANCELAR</button>
+</div></div>
+</div>
+
+<div id="taskbar"><span id="status">root:off | $50 | 0 redes</span><span>SOLITARIO OS v4</span></div>
+
+<script>
+let money=50, isRoot=false, hosts=[{nick:'Roteador Casa',userhost:'admin@192.168.1.1',port:22,proto:'ssh'}];
+let nearbyNets=[];
+function log(el,t){el.innerHTML+=t+'<br>';el.scrollTop=el.scrollHeight}
+function openW(id){document.getElementById(id).classList.add('active')}
+function closeW(id){document.getElementById(id).classList.remove('active')}
+function showAdd(){document.getElementById('addModal').classList.add('active')}
+function hideAdd(){document.getElementById('addModal').classList.remove('active')}
+
+function renderHosts(){
+ let d=document.getElementById('hlist'); d.innerHTML='';
+ hosts.forEach((h,i)=>{
+  d.innerHTML+=`<div class="host" onclick="connectHost(${i})"><div><b>${h.nick}</b><br><small>${h.proto}://${h.userhost}:${h.port}</small></div><div>➤</div></div>`;
+ });
+ document.getElementById('status').innerText=`root:${isRoot?'on':'off'} | $${money} | ${hosts.length} hosts`;
+}
+renderHosts();
+
+function scanNear(){
+ let out=document.getElementById('nout');
+ out.innerHTML='[*] Escaneando redes WiFi e IPs próximos...<br>';
+ setTimeout(()=>{
+  nearbyNets=[
+   {ssid:'VIVO-5G-9821', ip:'192.168.15.1', sig:'-42dBm Excelente', sec:'WPA2', ports:'22/open 80/open', vuln:true},
+   {ssid:'Claro_2.4G', ip:'192.168.0.1', sig:'-67dBm Bom', sec:'WPA2', ports:'23/open telnet 80/open', vuln:true},
+   {ssid:'PC-ALVO-SALA', ip:'10.0.0.5', sig:'-51dBm', sec:'Aberta', ports:'22/open 445/open', vuln:true},
+   {ssid:'NET-FAST-402', ip:'172.16.0.1
