@@ -1,176 +1,60 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HACKER SOLITARIO OS v3</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>HACKER SOLITARIO OS v4</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:monospace}
-body{background:#0a0a0a;color:#0f0;height:100vh;overflow:hidden}
-#desktop{background:#1a1f2a;height:100vh;padding:10px}
-#icons{display:flex;gap:15px;flex-wrap:wrap}
-.icon{width:72px;text-align:center;padding:8px;border-radius:6px;cursor:pointer}
-.icon:hover{background:rgba(0,255,0,.15)}
-.icon b{font-size:32px;display:block}
-.icon span{font-size:10px;color:#9f9}
-.window{position:absolute;left:2%;top:5%;width:96%;height:80%;background:#000;border:2px solid #0f0;display:none;flex-direction:column;z-index:20;box-shadow:0 0 30px #0f03}
+body{background:#000;color:#0f0;height:100vh;overflow:hidden}
+#desktop{background:#121a25;height:100vh;padding:10px}
+.icon{width:70px;text-align:center;padding:8px;cursor:pointer;display:inline-block;margin:5px;border-radius:6px}
+.icon:hover{background:rgba(0,255,0,.2)}
+.icon b{font-size:30px;display:block}
+.window{position:absolute;left:1%;top:2%;width:98%;height:88%;background:#000;border:2px solid #0f0;display:none;flex-direction:column;z-index:10}
 .window.active{display:flex}
 .titlebar{background:#0f0;color:#000;padding:6px 10px;display:flex;justify-content:space-between;font-weight:bold}
-.term{flex:1;overflow-y:auto;padding:10px;font-size:13px}
+.term{flex:1;overflow-y:auto;padding:10px;font-size:12px}
 .input{display:flex;background:#111;border-top:1px solid #0f0;padding:6px}
-.input input{flex:1;background:#000;border:none;color:#0f0;outline:none;padding:5px}
-#hosts{padding:10px}
-.host{background:#111;border:1px solid #0a0;padding:10px;margin:6px 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
-.host:hover{background:#1a2a1a;border-color:#0f0}
-.host.name{font-weight:bold;color:#0f0}
-.host.addr{font-size:11px;color:#888}
-#addBtn{background:#0f0;color:#000;border:none;padding:10px;width:100%;font-weight:bold;cursor:pointer;margin-top:10px}
+.input input{flex:1;background:#000;border:none;color:#0f0;outline:none}
+.net{background:#111;border:1px solid #0a0;margin:6px 0;padding:8px;cursor:pointer}
+.net:hover{border-color:#0f0;background:#1a2a1a}
+.net b{color:#0f0}
+.tag{font-size:10px;background:#0f0;color:#000;padding:2px 4px;margin-left:5px}
+#addBtn{background:#0f0;color:#000;border:none;padding:10px;width:100%;font-weight:bold;cursor:pointer}
+.host{background:#111;border:1px solid #0a0;padding:8px;margin:5px 0;display:flex;justify-content:space-between;cursor:pointer}
 .modal{position:absolute;inset:0;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;z-index:50}
 .modal.active{display:flex}
-.modal-box{background:#000;border:2px solid #0f0;padding:15px;width:90%;max-width:400px}
-.modal-box h3{margin-bottom:10px;color:#0f0}
-.modal-box input,.modal-box select{width:100%;background:#111;border:1px solid #0f0;color:#0f0;padding:8px;margin:5px 0}
+.modal-box{background:#000;border:2px solid #0f0;padding:15px;width:90%;max-width:380px}
+.modal-box input,select{width:100%;background:#111;border:1px solid #0f0;color:#0f0;padding:7px;margin:4px 0}
 #taskbar{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:2px solid #0f0;padding:5px 10px;font-size:11px;display:flex;justify-content:space-between}
 </style>
 </head>
 <body>
 <div id="desktop">
-<div id="icons">
 <div class="icon" onclick="openW('termux')"><b>📱</b><span>Termux</span></div>
 <div class="icon" onclick="openW('connect')"><b>🔌</b><span>ConnectBot</span></div>
 <div class="icon" onclick="openW('nmap')"><b>🌐</b><span>Nmap</span></div>
 </div>
-</div>
 
-<!-- TERMUX -->
 <div id="termux" class="window active">
-<div class="titlebar"><span>Termux - solitario@localhost</span><b onclick="closeW('termux')" style="cursor:pointer">[X]</b></div>
+<div class="titlebar"><span>Termux</span><b onclick="closeW('termux')" style="cursor:pointer">[X]</b></div>
 <div id="tout" class="term"></div>
-<div class="input"><span style="margin-right:5px">$</span><input id="tin" placeholder="help, su, ls, cat, nmap, node, rd"></div>
+<div class="input"><span>$ </span><input id="tin" placeholder="help"></div>
 </div>
 
-<!-- CONNECTBOT REAL -->
+<div id="nmap" class="window">
+<div class="titlebar"><span>Nmap - Scanner de Redes Próximas</span><b onclick="closeW('nmap')" style="cursor:pointer">[X]</b></div>
+<div style="padding:10px;display:flex;gap:5px">
+<input id="nin" placeholder="192.168.1.0/24 ou deixe vazio p/ escanear perto" style="flex:1;background:#111;border:1px solid #0f0;color:#0f0;padding:8px">
+<button onclick="scanNear()" style="background:#0f0;color:#000;border:none;padding:8px;font-weight:bold">SCAN</button>
+</div>
+<div id="nout" class="term"></div>
+</div>
+
 <div id="connect" class="window">
 <div class="titlebar"><span>ConnectBot - Hosts</span><b onclick="closeW('connect')" style="cursor:pointer">[X]</b></div>
-<div id="hosts"></div>
-<button id="addBtn" onclick="showAdd()">+ ADICIONAR HOST</button>
-<div id="connTerm" class="term" style="display:none;border-top:2px solid #0f0"></div>
-<div id="connInput" class="input" style="display:none"><span>#> </span><input id="cin"></div>
-
-<div id="addModal" class="modal">
-<div class="modal-box">
-<h3>Novo Host</h3>
-<label>Protocolo</label>
-<select id="proto"><option>ssh</option><option>telnet</option><option>local</option></select>
-<label>Apelido</label>
-<input id="nick" placeholder="ex: server alvo">
-<label>Usuário@Host</label>
-<input id="userhost" placeholder="root@192.168.1.1">
-<label>Porta</label>
-<input id="port" placeholder="22" value="22">
-<button style="background:#0f0;color:#000;border:none;padding:8px;width:48%;margin-top:10px" onclick="addHost()">SALVAR</button>
-<button style="background:#111;color:#0f0;border:1px solid #0f0;padding:8px;width:48%" onclick="hideAdd()">CANCELAR</button>
-</div>
-</div>
-</div>
-
-<!-- NMAP -->
-<div id="nmap" class="window">
-<div class="titlebar"><span>Nmap - Scanner</span><b onclick="closeW('nmap')" style="cursor:pointer">[X]</b></div>
-<div id="nout" class="term"></div>
-<div class="input"><span>nmap></span><input id="nin" placeholder="nmap 192.168.1.1"></div>
-</div>
-
-<div id="taskbar"><span id="status">root:off | $50</span><span>HACKER SOLITARIO v3</span></div>
-
-<script>
-let money=50, isRoot=false;
-let path=['home'];
-let fs={home:{'alvos.txt':'192.168.1.1 - roteador\n10.0.0.5 - pc alvo','senha.txt':'admin:1234'}};
-let hosts=[{nick:'Roteador Casa', userhost:'admin@192.168.1.1', port:22, proto:'ssh'}];
-
-function log(el,t){el.innerHTML+=t+'<br>';el.scrollTop=el.scrollHeight}
-function openW(id){document.getElementById(id).classList.add('active')}
-function closeW(id){document.getElementById(id).classList.remove('active')}
-function showAdd(){document.getElementById('addModal').classList.add('active')}
-function hideAdd(){document.getElementById('addModal').classList.remove('active')}
-
-function renderHosts(){
- let h=document.getElementById('hosts');
- h.innerHTML='';
- hosts.forEach((ho,i)=>{
-  h.innerHTML+=`<div class="host" onclick="connectHost(${i})"><div><div class="name">${ho.nick}</div><div class="addr">${ho.proto}://${ho.userhost}:${ho.port}</div></div><div>➤</div></div>`;
- });
-}
-renderHosts();
-
-function addHost(){
- let nick=document.getElementById('nick').value||'novo host';
- let uh=document.getElementById('userhost').value||'root@10.0.0.5';
- let port=document.getElementById('port').value||'22';
- let proto=document.getElementById('proto').value;
- hosts.push({nick, userhost:uh, port, proto});
- renderHosts(); hideAdd();
- document.getElementById('nick').value=''; document.getElementById('userhost').value='';
-}
-function connectHost(i){
- let ho=hosts[i];
- let term=document.getElementById('connTerm');
- let inp=document.getElementById('connInput');
- term.style.display='block'; inp.style.display='flex';
- term.innerHTML='';
- log(term, `Conectando em ${ho.proto}://${ho.userhost}:${ho.port}...`);
- setTimeout(()=>{
-  log(term, `Conectado em ${ho.userhost}`);
-  log(term, `Last login: hoje`);
-  log(term, `${ho.userhost.split('@')[1]}:~# <- você é ROOT aqui`);
-  log(term, `Digite: ls, cat, whoami, su`);
-  money+=75; document.getElementById('status').innerText=`root:on | $${money}`;
- },800);
-}
-
-// TERMUX LOGIC
-let tout=document.getElementById('tout');
-log(tout,'Termux v0.118 - Digite help');
-let tin=document.getElementById('tin');
-tin.addEventListener('keydown',e=>{
- if(e.key==='Enter'){
-  let full=tin.value.trim(); let a=full.split(' '); let c=a[0].toLowerCase();
-  log(tout, `<span style="color:#555">$ ${full}</span>`);
-  if(c=='help') log(tout,'Comandos REAIS: su, whoami, pwd, ls, cat [arq], cd, clear, rd/rmdir [arq], mkdir [nome], nmap [ip], ssh, node [codigo], buy, money');
-  else if(c=='su'){isRoot=true; log(tout,'root concedido #'); document.getElementById('status').innerText=`root:on | $${money}`}
-  else if(c=='whoami') log(tout, isRoot?'root':'solitario')
-  else if(c=='pwd') log(tout,'/'+path.join('/'))
-  else if(c=='ls'){ let cur=fs; for(let p of path) cur=cur[p]; log(tout, Object.keys(cur).join(' ')) }
-  else if(c=='cat'){ let cur=fs; for(let p of path) cur=cur[p]; log(tout, cur[a[1]]||'arquivo nao encontrado')}
-  else if(c=='clear') tout.innerHTML=''
-  else if(c=='rd'||c=='rmdir'||c=='rm'){ let cur=fs; for(let p of path) cur=cur[p]; delete cur[a[1]]; log(tout,'removido: '+a[1])}
-  else if(c=='mkdir'){ let cur=fs; for(let p of path) cur=cur[p]; cur[a[1]]={}; log(tout,'pasta criada: '+a[1])}
-  else if(c=='money') log(tout,'$'+money)
-  else if(c=='nmap'){ openW('nmap'); document.getElementById('nin').value=a[1]||'192.168.1.1'; doNmap(a[1]||'192.168.1.1')}
-  else if(c=='ssh') openW('connect')
-  else if(c=='node'||c=='javascript'){ try{ log(tout, '> '+eval(a.slice(1).join(' ')))}catch{ log(tout,'ex: node 2+2 ou node Math.random()')} }
-  else log(tout, c+': nao encontrado');
-  tin.value='';
- }
-});
-
-// NMAP
-function doNmap(ip){ let o=document.getElementById('nout'); log(o,`Nmap scan ${ip}`); setTimeout(()=>{log(o,`PORT 22/open ssh\nPORT 80/open http\nPORT 8080/open proxy\n[*] Alvo vulneravel! Use connectbot para invadir`); money+=30},1000)}
-document.getElementById('nin').addEventListener('keydown',e=>{if(e.key==='Enter'){doNmap(e.target.value); e.target.value=''}})
-
-// CONNECT INPUT
-document.getElementById('cin').addEventListener('keydown',e=>{
- if(e.key==='Enter'){
-  let v=e.target.value; let term=document.getElementById('connTerm');
-  log(term, `# ${v}`);
-  if(v=='ls') log(term,'root.txt etc/ home/');
-  else if(v.startsWith('cat')) log(term,'Conteúdo hackeado! Senha: 123456')
-  else if(v=='whoami') log(term,'root')
-  else log(term,'comando executado: '+v);
-  e.target.value='';
- }
-});
-</script>
-</body>
-</html>
+<div id="hosts" style="padding:10px;overflow-y:auto"></div>
+<button id="addBtn" onclick="showAdd()">+ ADICIONAR HOST MANUAL</button>
+<div id="cterm" class="term" style="display:none;border-top:2px solid #0f0"></div>
+<div id="cinput" class="input" style="display:none"><span># </span><input id="cin"></div>
+<div id="addModal" class
