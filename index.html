@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HACKER v3</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:monospace}
+body{background:#0a0a0a;color:#0f0;height:100vh;overflow:hidden}
+#desktop{background:#1a1f2a;height:100vh;padding:12px}
+#icons{display:flex;gap:15px;flex-wrap:wrap}
+.icon{width:72px;text-align:center;padding:8px;border-radius:6px;cursor:pointer;border:1px solid transparent}
+.icon:active{background:rgba(0,255,0,.2)}
+.icon b{font-size:32px;display:block}
+.icon span{font-size:10px;color:#9f9}
+.window{position:absolute;left:2%;top:3%;width:96%;height:82%;background:#000;border:2px solid #0f0;display:none;flex-direction:column;z-index:10}
+.window.active{display:flex}
+.titlebar{background:#0f0;color:#000;height:34px;display:flex;align-items:center;justify-content:space-between;padding-left:10px;font-weight:bold}
+.closeBtn{background:#000;color:#0f0;border:1px solid #0f0;width:34px;height:34px;cursor:pointer;font-weight:bold}
+.term{flex:1;overflow:auto;padding:10px;font-size:12px;line-height:1.4}
+.input{display:flex;background:#111;border-top:1px solid #0f0;padding:6px}
+.input input{flex:1;background:#000;border:none;color:#0f0;outline:none;padding:6px}
+.host{background:#111;border:1px solid #333;padding:8px;margin:5px 0;cursor:pointer}
+.net{background:#111;border:1px solid #222;padding:8px;margin:5px 0;font-size:11px}
+#taskbar{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:2px solid #0f0;padding:6px 10px;font-size:11px;display:flex;justify-content:space-between;z-index:100}
+.btn{padding:6px 10px;background:#0f0;color:#000;border:none;font-weight:bold;cursor:pointer;width:100%;margin-top:5px}
+.btn2{padding:5px 8px;background:#111;color:#0f0;border:1px solid #0f0;cursor:pointer;margin-top:5px;font-size:11px}
+.browser{background:#fff;color:#000;flex:1;overflow:auto;padding:0;font-family:Arial}
+</style>
+</head>
+<body>
+<div id="desktop">
+<div id="icons">
+<div class="icon" onclick="openW('termux')"><b>📱</b><span>Termux</span></div>
+<div class="icon" onclick="openW('connect')"><b>🔌</b><span>ConnectBot</span></div>
+<div class="icon" onclick="openW('nmap')"><b>🌐</b><span>Nmap</span></div>
+<div class="icon" onclick="openW('google')"><b>🔍</b><span>Google</span></div>
+<div class="icon" onclick="openW('chrome')"><b>🌍</b><span>Chrome</span></div>
+</div>
+</div>
+
+<div id="termux" class="window active">
+<div class="titlebar"><span>Termux</span><button class="closeBtn" onclick="closeW('termux')">X</button></div>
+<div id="tout" class="term"></div>
+<div class="input"><span>$ </span><input id="tin" placeholder="help"></div>
+</div>
+
+<div id="connect" class="window">
+<div class="titlebar"><span>ConnectBot</span><button class="closeBtn" onclick="closeW('connect')">X</button></div>
+<div id="hosts" class="term"></div>
+<button class="btn" onclick="showAdd()">+ ADD HOST</button>
+<div id="ct" class="term" style="display:none;border-top:1px solid #0f0"></div>
+<div id="ci" class="input" style="display:none"><input id="cin" placeholder="comando"></div>
+</div>
+
+<div id="nmap" class="window">
+<div class="titlebar"><span>Nmap</span><button class="closeBtn" onclick="closeW('nmap')">X</button></div>
+<div style="padding:8px"><button class="btn" onclick="scan()">SCANEAR REDES POR PERTO</button></div>
+<div id="nout" class="term"></div>
+</div>
+
+<div id="google" class="window">
+<div class="titlebar"><span>Google</span><button class="closeBtn" onclick="closeW('google')">X</button></div>
+<div class="browser" style="padding:20px">
+<div style="text-align:center;font-size:36px;font-weight:bold;margin:20px 0"><span style="color:#4285f4">G</span><span style="color:#ea4335">o</span><span style="color:#fbbc05">o</span><span style="color:#4285f4">g</span><span style="color:#34a853">l</span><span style="color:#ea4335">e</span></div>
+<input id="gq" style="width:100%;padding:10px;border-radius:20px;border:1px solid #ccc" placeholder="Pesquisar..." onkeydown="if(event.key=='Enter') gsearch()">
+<button class="btn2" style="display:block;margin:10px auto" onclick="gsearch()">Pesquisar</button>
+<div id="gres" style="margin-top:15px"></div>
+</div>
+</div>
+
+<div id="chrome" class="window">
+<div class="titlebar"><span>Chrome</span><button class="closeBtn" onclick="closeW('chrome')">X</button></div>
+<div style="display:flex;padding:5px;background:#eee;gap:5px"><input id="curl" value="google.com" style="flex:1;padding:5px"><button class="btn2" onclick="cgo()">GO</button></div>
+<div id="ccontent" class="browser" style="padding:15px"></div>
+</div>
+
+<div id="taskbar"><span id="st">root:off | $50</span><span>v3 FIX</span></div>
+
+<script>
+let money=50,isRoot=false;
+let hosts=[{n:'Roteador Casa',h:'admin@192.168.1.1'}];
+let redes=[
+{ssid:'VIVO-FIBRA-9012',ip:'192.168.1.1',mac:'AA:BB:CC:11:22',sig:'-45 FORTE',sec:'WPA2',ports:'22,80,443',user:'admin'},
+{ssid:'NET-CLARO_5G',ip:'192.168.0.105',mac:'DD:EE:FF:44:55',sig:'-67 MEDIO',sec:'WPA2',ports:'22,8080',user:'root'},
+{ssid:'Oi-Wifi',ip:'10.0.0.5',mac:'11:22:33:AA:BB',sig:'-78 FRACO',sec:'ABERTA',ports:'22,23,80',user:'root'},
+{ssid:'PC-ALVO',ip:'172.16.0.23',mac:'99:88:77:66:55',sig:'-52 FORTE',sec:'WPA3',ports:'22,3389',user:'admin'}
+];
+function log(id,t){let e=document.getElementById(id);e.innerHTML+=t+'<br>';e.scrollTop=e.scrollHeight}
+function openW(id){document.getElementById(id).classList.add('active')}
+function closeW(id){document.getElementById(id).classList.remove('active')}
+function render(){let h=document.getElementById('hosts');h.innerHTML='';hosts.forEach((x,i)=>{h.innerHTML+=`<div class=host onclick="conn(${i})"><b>${x.n}</b><div style=color:#888;font-size:11px>${x.h}</div></div>`})}
+render();
+function conn(i){let ct=document.getElementById('ct');let ci=document.getElementById('ci');ct.style.display='block';ci.style.display='flex';ct.innerHTML='';log('ct','Conectando '+hosts[i].h+'...');setTimeout(()=>{log('ct','✔ ROOT! +$75');money+=75;document.getElementById('st').innerText='root:on | $'+money},600)}
+function scan(){let o=document.getElementById('nout');o.innerHTML='';log('nout','[Nmap] Escaneando wlan0...');setTimeout(()=>{redes.forEach((r,i)=>{o.innerHTML+=`<div class=net><b>📶 ${r.ssid}</b><br>IP ${r.ip} | MAC ${r.mac} | ${r.sig} | ${r.sec}<br>Portas ${r.ports}<br><button class=btn2 onclick="addNet(${i})">CONECTAR VIA CONNECTBOT</button></div>`});log('nout','4 redes achadas +$30');money+=30;document.getElementById('st').innerText='root:'+(isRoot?'on':'off')+' | $'+money},700)}
+function addNet(i){let r=redes[i];hosts.push({n:r.ssid,h:r.user+'@'+r.ip});render();openW('connect');log('nout',r.ssid+' add no ConnectBot!')}
+function showAdd(){let n=prompt('Apelido:');let h=prompt('user@ip:','root@192.168.1.1');if(n&&h){hosts.push({n,h});render()}}
+function gsearch(){let q=document.getElementById('gq').value;let r=document.getElementById('gres');r.innerHTML=`<div style=font-size:12px;color:#555>Resultados para "${q}"</div><div style=margin-top:10px><b style=color:#1a0dab>Como usar nmap ${redes[0].ip}</b><br><span style=color:#006621>hacker-solitario.com</span><br>Use scanear redes por perto no Nmap e conecte via ConnectBot</div>`;money+=5;document.getElementById('st').innerText='root:'+(isRoot?'on':'off')+' | $'+money}
+function cgo(){let u=document.getElementById('curl').value;let c=document.getElementById('ccontent');c.innerHTML=`<h3>Site: ${u}</h3><p style=margin-top:10px>Você achou um alvo!</p><p>IP: ${redes[0].ip}</p><button class=btn2 onclick="addNet(0)">Add no ConnectBot</button>`}
+let tout=document.getElementById('tout');
+function tlog(t){tout.innerHTML+=t+'<br>';tout.scrollTop=tout.scrollHeight}
+tlog('HACKER SOLITARIO v3 FIX<br>Digite help');
+document.getElementById('tin').addEventListener('keydown',e=>{if(e.key==='Enter'){let v=e.target.value;let a=v.split(' ');tlog('$ '+v);if(a[0]=='help')tlog('help su ls cat nmap money');else if(a[0]=='su'){isRoot=true;tlog('root #');document.getElementById('st').innerText='root:on | $'+money}else if(a[0]=='ls')tlog('alvos.txt senha.txt');else if(a[0]=='cat')tlog('conteudo do arquivo');else if(a[0]=='clear')tout.innerHTML='';else if(a[0]=='nmap'){openW('nmap');scan()}else if(a[0]=='money')tlog('$'+money);else if(a[0]=='node'){try{tlog('> '+eval(a.slice(1).join(' ')))}catch{}}else tlog(a[0]+': nao achado');e.target.value=''}});
+window.onload=()=>{document.getElementById('ccontent').innerHTML='<div style=text-align:center;margin-top:30px><div style=font-size:32px><span style=color:#4285f4>G</span><span style=color:#ea4335>o</span><span style=color:#fbbc05>o</span><span style=color:#4285f4>g</span><span style=color:#34a853>l</span><span style=color:#ea4335>e</span></div><p style=color:#666;margin-top:10px>Chrome - modo hacker</p></div>'}
+</script>
+</body>
+</html>
