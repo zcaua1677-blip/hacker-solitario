@@ -3,32 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HACKER SOLITARIO OS v4</title>
+<title>HACKER SOLITARIO OS v3</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:monospace}
 body{background:#0a0a0a;color:#0f0;height:100vh;overflow:hidden}
-#desktop{background:radial-gradient(#1a2a1a,#0f1419);height:100vh;padding:12px}
-#icons{display:flex;gap:15px}
-.icon{width:72px;text-align:center;padding:8px;cursor:pointer;border-radius:6px}
+#desktop{background:#1a1f2a;height:100vh;padding:10px}
+#icons{display:flex;gap:15px;flex-wrap:wrap}
+.icon{width:72px;text-align:center;padding:8px;border-radius:6px;cursor:pointer}
 .icon:hover{background:rgba(0,255,0,.15)}
 .icon b{font-size:32px;display:block}
-.window{position:absolute;left:1%;top:2%;width:98%;height:85%;background:#000;border:2px solid #0f0;display:none;flex-direction:column;z-index:20;box-shadow:0 0 25px #0f04}
+.icon span{font-size:10px;color:#9f9}
+.window{position:absolute;left:2%;top:5%;width:96%;height:80%;background:#000;border:2px solid #0f0;display:none;flex-direction:column;z-index:20;box-shadow:0 0 30px #0f03}
 .window.active{display:flex}
 .titlebar{background:#0f0;color:#000;padding:6px 10px;display:flex;justify-content:space-between;font-weight:bold}
-.term{flex:1;overflow-y:auto;padding:10px;font-size:12px;line-height:1.4}
+.term{flex:1;overflow-y:auto;padding:10px;font-size:13px}
 .input{display:flex;background:#111;border-top:1px solid #0f0;padding:6px}
-.input input{flex:1;background:#000;border:none;color:#0f0;outline:none}
-.net{background:#0f0f0f;border:1px solid #0a0;padding:8px;margin:6px 0}
-.net b{color:#0f0}
-.btn{background:#0f0;color:#000;border:none;padding:6px 10px;font-weight:bold;cursor:pointer;margin:3px}
-.btn2{background:#111;color:#0f0;border:1px solid #0f0;padding:6px 10px;cursor:pointer}
-#taskbar{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:2px solid #0f0;padding:5px 10px;font-size:11px;display:flex;justify-content:space-between}
-.host{background:#111;border:1px solid #0a0;padding:8px;margin:5px 0;display:flex;justify-content:space-between;cursor:pointer}
-.host:hover{border-color:#0f0}
+.input input{flex:1;background:#000;border:none;color:#0f0;outline:none;padding:5px}
+#hosts{padding:10px;overflow:auto}
+.host{background:#111;border:1px solid #0a0;padding:10px;margin:6px 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.host:hover{background:#1a2a1a;border-color:#0f0}
+.net{background:#0f0f0f;border:1px solid #222;padding:8px;margin:6px 0;font-size:11px}
+#addBtn{background:#0f0;color:#000;border:none;padding:10px;width:100%;font-weight:bold;cursor:pointer;margin-top:10px}
 .modal{position:absolute;inset:0;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;z-index:50}
 .modal.active{display:flex}
-.modal-box{background:#000;border:2px solid #0f0;padding:15px;width:92%;max-width:380px}
-.modal-box input,select{width:100%;background:#111;border:1px solid #0f0;color:#0f0;padding:7px;margin:4px 0}
+.modal-box{background:#000;border:2px solid #0f0;padding:15px;width:90%;max-width:400px}
+.modal-box h3{margin-bottom:10px;color:#0f0}
+.modal-box input,.modal-box select{width:100%;background:#111;border:1px solid #0f0;color:#0f0;padding:8px;margin:5px 0}
+#taskbar{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:2px solid #0f0;padding:5px 10px;font-size:11px;display:flex;justify-content:space-between}
+.btn2{background:#111;color:#0f0;border:1px solid #0f0;padding:5px 8px;cursor:pointer;margin-top:5px;font-size:11px}
 </style>
 </head>
 <body>
@@ -36,48 +38,54 @@ body{background:#0a0a0a;color:#0f0;height:100vh;overflow:hidden}
 <div id="icons">
 <div class="icon" onclick="openW('termux')"><b>📱</b><span>Termux</span></div>
 <div class="icon" onclick="openW('connect')"><b>🔌</b><span>ConnectBot</span></div>
-<div class="icon" onclick="openW('nmap')"><b>🌐</b><span>Nmap</span></div>
+<div class="icon" onclick="openW('nmapwin')"><b>🌐</b><span>Nmap</span></div>
 </div>
 </div>
 
 <div id="termux" class="window active">
-<div class="titlebar"><span>Termux</span><b onclick="closeW('termux')" style="cursor:pointer">[X]</b></div>
+<div class="titlebar"><span>Termux - solitario@localhost</span><b onclick="closeW('termux')" style="cursor:pointer">[X]</b></div>
 <div id="tout" class="term"></div>
-<div class="input"><span>$ </span><input id="tin" placeholder="help"></div>
-</div>
-
-<div id="nmap" class="window">
-<div class="titlebar"><span>Nmap - Scanner de Redes Próximas</span><b onclick="closeW('nmap')" style="cursor:pointer">[X]</b></div>
-<div style="padding:8px;display:flex;gap:5px">
-<button class="btn" onclick="scanNear()">📡 SCANEAR REDES PERTO</button>
-<button class="btn2" onclick="document.getElementById('nout').innerHTML=''">LIMPAR</button>
-</div>
-<div id="nout" class="term">Clique em SCANEAR para achar redes por perto...</div>
-<div class="input"><span>nmap> </span><input id="nin" placeholder="nmap 192.168.1.1"></div>
+<div class="input"><span style="margin-right:5px">$</span><input id="tin" placeholder="help, su, ls, cat, nmap, node, rd"></div>
 </div>
 
 <div id="connect" class="window">
 <div class="titlebar"><span>ConnectBot - Hosts</span><b onclick="closeW('connect')" style="cursor:pointer">[X]</b></div>
-<div id="hlist" style="padding:8px;overflow:auto;flex:1"></div>
-<button class="btn" style="width:100%" onclick="showAdd()">+ ADICIONAR HOST MANUAL</button>
-<div id="cterm" class="term" style="display:none;border-top:2px solid #0f0"></div>
-<div id="cinput" class="input" style="display:none"><span>#> </span><input id="cin"></div>
+<div id="hosts"></div>
+<button id="addBtn" onclick="showAdd()">+ ADICIONAR HOST</button>
+<div id="connTerm" class="term" style="display:none;border-top:2px solid #0f0"></div>
+<div id="connInput" class="input" style="display:none"><span>#> </span><input id="cin"></div>
 <div id="addModal" class="modal"><div class="modal-box">
 <h3>Novo Host</h3>
-<select id="proto"><option>ssh</option><option>telnet</option><option>local</option></select>
-<input id="nick" placeholder="Apelido">
-<input id="userhost" placeholder="root@192.168.1.1">
-<input id="port" value="22" placeholder="Porta">
-<button class="btn" onclick="addHostManual()" style="width:48%">SALVAR</button>
-<button class="btn2" onclick="hideAdd()" style="width:48%">CANCELAR</button>
+<label>Protocolo</label><select id="proto"><option>ssh</option><option>telnet</option><option>local</option></select>
+<label>Apelido</label><input id="nick" placeholder="ex: server alvo">
+<label>Usuário@Host</label><input id="userhost" placeholder="root@192.168.1.1">
+<label>Porta</label><input id="port" placeholder="22" value="22">
+<button style="background:#0f0;color:#000;border:none;padding:8px;width:48%;margin-top:10px" onclick="addHost()">SALVAR</button>
+<button style="background:#111;color:#0f0;border:1px solid #0f0;padding:8px;width:48%" onclick="hideAdd()">CANCELAR</button>
 </div></div>
 </div>
 
-<div id="taskbar"><span id="status">root:off | $50 | 0 redes</span><span>SOLITARIO OS v4</span></div>
+<div id="nmapwin" class="window">
+<div class="titlebar"><span>Nmap Scanner - Redes por Perto</span><b onclick="closeW('nmapwin')" style="cursor:pointer">[X]</b></div>
+<div style="padding:8px"><button style="background:#0f0;color:#000;border:none;padding:8px;width:100%;font-weight:bold;cursor:pointer" onclick="scanRedes()">🔍 SCANEAR REDES POR PERTO</button></div>
+<div id="nout" class="term"></div>
+<div class="input"><span>nmap></span><input id="nin" placeholder="nmap 192.168.1.1"></div>
+</div>
+
+<div id="taskbar"><span id="status">root:off | $50</span><span>HACKER SOLITARIO v3.1</span></div>
 
 <script>
-let money=50, isRoot=false, hosts=[{nick:'Roteador Casa',userhost:'admin@192.168.1.1',port:22,proto:'ssh'}];
-let nearbyNets=[];
+let money=50, isRoot=false;
+let path=['home'];
+let fs={home:{'alvos.txt':'192.168.1.1 - roteador\n10.0.0.5 - pc alvo','senha.txt':'admin:1234'}};
+let hosts=[{nick:'Roteador Casa', userhost:'admin@192.168.1.1', port:22, proto:'ssh'}];
+let redes=[
+ {ssid:'VIVO-FIBRA-9012',ip:'192.168.1.1',mac:'AA:BB:CC:11:22',sig:'-45dBm FORTE',sec:'WPA2',ports:'22,80,443',user:'admin'},
+ {ssid:'NET-CLARO_5G',ip:'192.168.0.105',mac:'DD:EE:FF:44:55',sig:'-67dBm MEDIO',sec:'WPA2',ports:'22,8080',user:'root'},
+ {ssid:'Oi-Wifi',ip:'10.0.0.5',mac:'11:22:33:AA:BB',sig:'-78dBm FRACO',sec:'ABERTA',ports:'22,23,80',user:'root'},
+ {ssid:'PC-ALVO',ip:'172.16.0.23',mac:'99:88:77:66:55',sig:'-52dBm FORTE',sec:'WPA3',ports:'22,3389',user:'admin'}
+];
+
 function log(el,t){el.innerHTML+=t+'<br>';el.scrollTop=el.scrollHeight}
 function openW(id){document.getElementById(id).classList.add('active')}
 function closeW(id){document.getElementById(id).classList.remove('active')}
@@ -85,20 +93,13 @@ function showAdd(){document.getElementById('addModal').classList.add('active')}
 function hideAdd(){document.getElementById('addModal').classList.remove('active')}
 
 function renderHosts(){
- let d=document.getElementById('hlist'); d.innerHTML='';
- hosts.forEach((h,i)=>{
-  d.innerHTML+=`<div class="host" onclick="connectHost(${i})"><div><b>${h.nick}</b><br><small>${h.proto}://${h.userhost}:${h.port}</small></div><div>➤</div></div>`;
+ let h=document.getElementById('hosts'); h.innerHTML='';
+ hosts.forEach((ho,i)=>{
+  h.innerHTML+=`<div class="host" onclick="connectHost(${i})"><div><div style="font-weight:bold;color:#0f0">${ho.nick}</div><div style="font-size:11px;color:#888">${ho.proto}://${ho.userhost}:${ho.port}</div></div><div>➤</div></div>`;
  });
- document.getElementById('status').innerText=`root:${isRoot?'on':'off'} | $${money} | ${hosts.length} hosts`;
 }
 renderHosts();
-
-function scanNear(){
- let out=document.getElementById('nout');
- out.innerHTML='[*] Escaneando redes WiFi e IPs próximos...<br>';
- setTimeout(()=>{
-  nearbyNets=[
-   {ssid:'VIVO-5G-9821', ip:'192.168.15.1', sig:'-42dBm Excelente', sec:'WPA2', ports:'22/open 80/open', vuln:true},
-   {ssid:'Claro_2.4G', ip:'192.168.0.1', sig:'-67dBm Bom', sec:'WPA2', ports:'23/open telnet 80/open', vuln:true},
-   {ssid:'PC-ALVO-SALA', ip:'10.0.0.5', sig:'-51dBm', sec:'Aberta', ports:'22/open 445/open', vuln:true},
-   {ssid:'NET-FAST-402', ip:'172.16.0.1
+function addHost(){
+ let nick=document.getElementById('nick').value||'novo host';
+ let uh=document.getElementById('userhost').value||'root@10.0.0.5';
+ let port=document
